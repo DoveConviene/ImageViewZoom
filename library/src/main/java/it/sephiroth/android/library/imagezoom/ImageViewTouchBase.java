@@ -217,7 +217,7 @@ public abstract class ImageViewTouchBase extends ImageView implements IDisposabl
             if (changed || mScaleTypeChanged || mBitmapChanged) {
 
                 if (mBitmapChanged) {
-                    mUserScaled = false;
+                    // mUserScaled = false;
                     mBaseMatrix.reset();
                     if (!mMinZoomDefined) {
                         mMinZoom = ZOOM_INVALID;
