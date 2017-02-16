@@ -192,13 +192,24 @@ public abstract class ImageViewTouchBase extends ImageView implements IDisposabl
 
         float deltaX = 0;
         float deltaY = 0;
+        float deltaScale = 1;
 
         if (changed) {
             mViewPortOld.set(mViewPort);
             onViewPortChanged(left, top, right, bottom);
 
-            deltaX = mViewPort.width() - mViewPortOld.width();
-            deltaY = mViewPort.height() - mViewPortOld.height();
+            Log.d(TAG, "old view port: " + mViewPortOld);
+            Log.d(TAG, "new view port: " + mViewPort);
+
+            float oldWidth = mViewPortOld.width();
+            float newWidth = mViewPort.width();
+            float oldHeight = mViewPortOld.height();
+            float newHeight = mViewPort.height();
+
+            deltaX = newWidth - oldWidth;
+            deltaY = newHeight - oldHeight;
+
+            deltaScale = Math.min(newWidth / oldWidth, newHeight / oldHeight);
         }
 
         super.onLayout(changed, left, top, right, bottom);
@@ -217,7 +228,7 @@ public abstract class ImageViewTouchBase extends ImageView implements IDisposabl
             if (changed || mScaleTypeChanged || mBitmapChanged) {
 
                 if (mBitmapChanged) {
-                    mUserScaled = false;
+                    // mUserScaled = false;
                     mBaseMatrix.reset();
                     if (!mMinZoomDefined) {
                         mMinZoom = ZOOM_INVALID;
@@ -244,6 +255,7 @@ public abstract class ImageViewTouchBase extends ImageView implements IDisposabl
                     Log.d(TAG, "new matrix scale: " + newMatrixScale);
                     Log.d(TAG, "old min scale: " + oldMinScale);
                     Log.d(TAG, "old scale: " + oldScale);
+                    Log.d(TAG, "delta x:" + deltaX + " y:" + deltaY + " scale:" + deltaScale);
                 }
 
                 // 1. bitmap changed or scaletype changed
@@ -294,7 +306,7 @@ public abstract class ImageViewTouchBase extends ImageView implements IDisposabl
                         zoomTo(scale);
                     } else {
                         if (Math.abs(oldScale - oldMinScale) > MIN_SCALE_DIFF) {
-                            scale = (oldMatrixScale / newMatrixScale) * oldScale;
+                            scale = oldScale * deltaScale;
                         }
                         if (DEBUG) {
                             Log.v(TAG, "userScaled. scale=" + scale);
